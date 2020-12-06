@@ -1,6 +1,5 @@
 package com.mgrubent.aoc2020;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 public class Main {
