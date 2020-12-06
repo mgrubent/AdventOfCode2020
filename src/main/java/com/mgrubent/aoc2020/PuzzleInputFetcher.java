@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PuzzleInputFetcher {
+public abstract class PuzzleInputFetcher {
     private static final Logger LOG = LoggerFactory.getLogger(PuzzleInputFetcher.class);
 
     private final Map<Integer, String> _cache = new ConcurrentHashMap<>();
@@ -92,8 +92,10 @@ public class PuzzleInputFetcher {
         }
     }
 
+    abstract int getYear();
+
     HttpUrl getRemotePuzzleInputUrl(int day) {
-        return HttpUrl.get("https://adventofcode.com/2019/day/" + day + "/input");
+        return HttpUrl.get("https://adventofcode.com/" + getYear() + "/day/" + day + "/input");
     }
 
     synchronized String getSessionToken() throws IOException {
