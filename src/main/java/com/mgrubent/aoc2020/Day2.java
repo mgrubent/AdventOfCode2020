@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public class Day2 extends Puzzle {
     private final static String FIRST_NUMBER = "firstNumber";
     private final static String SECOND_NUMBER = "secondNumber";
-    private final static String REQUIRED_LETTER = "requiredLetter";
+    private final static String REQUIRED_CHARACTER = "requiredCharacter";
     private final static String PASSWORD = "password";
 
     private final List<PasswordEntry> _entries;
@@ -25,13 +25,13 @@ public class Day2 extends Puzzle {
 
     static PasswordEntry parseLine(String line) {
         Pattern linePattern = Pattern.compile("(?<" + FIRST_NUMBER + ">[0-9]+)-(?<" + SECOND_NUMBER +
-                ">[0-9]+) (?<" + REQUIRED_LETTER + ">[a-z]): (?<" + PASSWORD + ">[a-zA-Z]+)");
+                ">[0-9]+) (?<" + REQUIRED_CHARACTER + ">[a-z]): (?<" + PASSWORD + ">[a-zA-Z]+)");
         Matcher m = linePattern.matcher(line);
 
         if (m.find()) {
             int firstNumber = Integer.parseInt(m.group(FIRST_NUMBER));
             int secondNumber = Integer.parseInt(m.group(SECOND_NUMBER));
-            char requiredLetter = m.group(REQUIRED_LETTER).charAt(0);
+            char requiredLetter = m.group(REQUIRED_CHARACTER).charAt(0);
             String password = m.group(PASSWORD);
 
             return new PasswordEntry(new PasswordPolicy(requiredLetter, firstNumber, secondNumber), password);
@@ -43,14 +43,14 @@ public class Day2 extends Puzzle {
 
     static boolean isEntryValid1(PasswordEntry entry) {
         // We want to ensure that the required letter occurs at least firstNumber times, and at most secondNumber times
-        long charOccurrence = entry.password().chars().filter(ch -> ch == entry.policy().requiredLetter()).count();
+        long charOccurrence = entry.password().chars().filter(ch -> ch == entry.policy().requiredCharacter()).count();
         return (charOccurrence >= entry.policy().firstNumber() && charOccurrence <= entry.policy().secondNumber());
     }
 
     static boolean isEntryValid2(PasswordEntry entry) {
         // We want to ensure that exactly one of the 1-indexed positions contains the required letter
-        return (entry.password().charAt(entry.policy().firstNumber() - 1) == entry.policy().requiredLetter() ^
-                entry.password().charAt(entry.policy().secondNumber() - 1) == entry.policy().requiredLetter());
+        return (entry.password().charAt(entry.policy().firstNumber() - 1) == entry.policy().requiredCharacter() ^
+                entry.password().charAt(entry.policy().secondNumber() - 1) == entry.policy().requiredCharacter());
     }
 
     @Override
@@ -69,7 +69,7 @@ public class Day2 extends Puzzle {
     }
 }
 
-record PasswordPolicy(char requiredLetter, int firstNumber, int secondNumber) {
+record PasswordPolicy(char requiredCharacter, int firstNumber, int secondNumber) {
 
 }
 
