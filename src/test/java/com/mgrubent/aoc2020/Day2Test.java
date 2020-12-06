@@ -34,4 +34,10 @@ public class Day2Test extends BasePuzzleTest {
         var day2 = new Day2(example);
         Assert.assertEquals("1", day2.solve2());
     }
+
+    @Test
+    public void testPart2() throws Exception {
+        var day2 = new Day2(getStoredInput(2));
+        Assert.assertEquals("688", day2.solve2());
+    }
 }
