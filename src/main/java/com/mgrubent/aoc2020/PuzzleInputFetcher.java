@@ -92,6 +92,7 @@ public abstract class PuzzleInputFetcher {
         }
     }
 
+    // Allow for this same InputFetcher to be used in subsequent years, so long as AoC doesn't change their backend
     abstract int getYear();
 
     HttpUrl getRemotePuzzleInputUrl(int day) {
