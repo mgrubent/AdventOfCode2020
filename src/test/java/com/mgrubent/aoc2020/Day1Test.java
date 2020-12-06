@@ -14,7 +14,6 @@ public class Day1Test extends BasePuzzleTest {
 
     @Test
     public void testExample1() {
-
         Day1 day1 = new Day1(example);
         Assert.assertEquals("514579", day1.solve1());
     }
