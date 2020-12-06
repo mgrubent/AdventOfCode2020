@@ -15,3 +15,5 @@ out/
 cookie.txt
 /logs/
 /puzzle/
+# Since, for now, this is just a symlink
+/src/test/resources/puzzle
