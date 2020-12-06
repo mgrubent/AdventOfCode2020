@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Day2 extends Puzzle {
-    private final static String MIN_OCCURRENCES = "minOccurrences";
-    private final static String MAX_OCCURRENCES = "maxOccurrences";
+    private final static String FIRST_NUMBER = "firstNumber";
+    private final static String SECOND_NUMBER = "secondNumber";
     private final static String REQUIRED_LETTER = "requiredLetter";
     private final static String PASSWORD = "password";
 
@@ -24,17 +24,17 @@ public class Day2 extends Puzzle {
     }
 
     static PasswordEntry parseLine(String line) {
-        Pattern linePattern = Pattern.compile("(?<" + MIN_OCCURRENCES + ">[0-9]+)-(?<" + MAX_OCCURRENCES +
+        Pattern linePattern = Pattern.compile("(?<" + FIRST_NUMBER + ">[0-9]+)-(?<" + SECOND_NUMBER +
                 ">[0-9]+) (?<" + REQUIRED_LETTER + ">[a-z]): (?<" + PASSWORD + ">[a-zA-Z]+)");
         Matcher m = linePattern.matcher(line);
 
         if (m.find()) {
-            int minOccurrences = Integer.parseInt(m.group(MIN_OCCURRENCES));
-            int maxOccurrences = Integer.parseInt(m.group(MAX_OCCURRENCES));
+            int firstNumber = Integer.parseInt(m.group(FIRST_NUMBER));
+            int secondNumber = Integer.parseInt(m.group(SECOND_NUMBER));
             char requiredLetter = m.group(REQUIRED_LETTER).charAt(0);
             String password = m.group(PASSWORD);
 
-            return new PasswordEntry(new PasswordPolicy(requiredLetter, minOccurrences, maxOccurrences), password);
+            return new PasswordEntry(new PasswordPolicy(requiredLetter, firstNumber, secondNumber), password);
         }
         else {
             throw new IllegalArgumentException("Passed string \"" + line + "\", but this is not a valid password entry");
@@ -42,13 +42,15 @@ public class Day2 extends Puzzle {
     }
 
     static boolean isEntryValid1(PasswordEntry entry) {
+        // We want to ensure that the required letter occurs at least firstNumber times, and at most secondNumber times
         long charOccurrence = entry.password().chars().filter(ch -> ch == entry.policy().requiredLetter()).count();
-        return (charOccurrence >= entry.policy().minOccurrences() && charOccurrence <= entry.policy().maxOccurrences());
+        return (charOccurrence >= entry.policy().firstNumber() && charOccurrence <= entry.policy().secondNumber());
     }
 
     static boolean isEntryValid2(PasswordEntry entry) {
-        return (entry.password().charAt(entry.policy().minOccurrences() - 1) == entry.policy().requiredLetter() ^
-                entry.password().charAt(entry.policy().maxOccurrences() - 1) == entry.policy().requiredLetter());
+        // We want to ensure that exactly one of the 1-indexed positions contains the required letter
+        return (entry.password().charAt(entry.policy().firstNumber() - 1) == entry.policy().requiredLetter() ^
+                entry.password().charAt(entry.policy().secondNumber() - 1) == entry.policy().requiredLetter());
     }
 
     @Override
@@ -67,7 +69,7 @@ public class Day2 extends Puzzle {
     }
 }
 
-record PasswordPolicy(char requiredLetter, int minOccurrences, int maxOccurrences) {
+record PasswordPolicy(char requiredLetter, int firstNumber, int secondNumber) {
 
 }
 
