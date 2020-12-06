@@ -1,25 +1,16 @@
 package com.mgrubent.aoc2020;
 
-import java.io.BufferedReader;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-public class Day1 implements Solution {
+public class Day1 extends Puzzle {
     private static final int SUM = 2020;
     private final List<Integer> _sortedIntegerList;
 
-    Day1(List<Integer> integerList) {
-        _sortedIntegerList = new ArrayList<>(integerList);
-        Collections.sort(_sortedIntegerList);
-    }
-
-    public Day1(BufferedReader inputFile) {
-        this(inputFile.lines()
-                .map(Integer::parseInt)
-                .collect(Collectors.toList()));
+    Day1(String input) {
+        super(input);
+        _sortedIntegerList = input.lines().map(Integer::valueOf).sorted().collect(Collectors.toList());
     }
 
     @Override
