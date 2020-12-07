@@ -39,6 +39,8 @@ public class Day3 extends Puzzle {
 
     @Override
     String solve1() {
+        // For this problem, they just happen to want us to use the Slope(3, 1),
+        // and it just happens to be at [1] in our list.
         Slope slope = _slopes.get(1);
         return Long.toString(countTrees(slope));
     }
