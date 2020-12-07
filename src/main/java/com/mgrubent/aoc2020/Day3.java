@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 public class Day3 extends Puzzle {
     private final Scroll _scroll;
-    private final Slope _slope;
+    private final List<Slope> _slopes;
 
     /**
      * Constructor which accepts the puzzle input to be solved
@@ -15,7 +15,12 @@ public class Day3 extends Puzzle {
     Day3(String input) {
         super(input);
         _scroll = new Scroll(input.lines().collect(Collectors.toList()));
-        _slope = new Slope(3, 1);
+        _slopes = List.of(
+                new Slope(1, 1),
+                new Slope(3, 1),
+                new Slope(5, 1),
+                new Slope(7, 1),
+                new Slope(1, 2));
     }
 
     @Override
@@ -23,38 +28,44 @@ public class Day3 extends Puzzle {
         return 3;
     }
 
-    @Override
-    String solve1() {
+    // Use long to make it easier to take the product of several counted trees
+    private long countTrees(Slope slope) {
         int treeCount = 0;
-        for (int y = 0, x = 0; y < _scroll.length(); y += _slope.down(), x += _slope.right()) {
+        for (int y = 0, x = 0; y < _scroll.length(); y += slope.down(), x += slope.right()) {
             if (_scroll.isTree(x, y)) treeCount++;
         }
-        return Integer.toString(treeCount);
+        return treeCount;
+    }
+
+    @Override
+    String solve1() {
+        Slope slope = _slopes.get(1);
+        return Long.toString(countTrees(slope));
     }
 
     @Override
     String solve2() {
-        return null;
+        long product = _slopes.stream().map(this::countTrees).reduce(1L, (x, y) -> x * y);
+        return Long.toString(product);
     }
 }
 
 /**
  * This class is intended to represent the infinite scroll-to-the-right given an initial "sprite"
  * input.
- *
+ * <p>
  * That is, (provided you do not overflow), you can ask about any X coordinate 0 or greater.
- *
+ * <p>
  * The Y coordinate, however, is still bound to the height of the given sprite.
- *
+ * <p>
  * The (X, Y) coordinate convention for a Scroll is as follows:
- *
+ * <p>
  * (0,0)                (4, 0)
  * .      .      .      .
  * .
  * .
  * .
  * (0, 4)
- *
  */
 class Scroll {
     private final List<String> _sprite;
