@@ -8,7 +8,8 @@ public class Main {
             new Day1(PUZZLE_INPUT_FETCHER.getPuzzleInput(1)),
             new Day2(PUZZLE_INPUT_FETCHER.getPuzzleInput(2)),
             new Day3(PUZZLE_INPUT_FETCHER.getPuzzleInput(3)),
-            new Day4(PUZZLE_INPUT_FETCHER.getPuzzleInput(4))
+            new Day4(PUZZLE_INPUT_FETCHER.getPuzzleInput(4)),
+            new Day5(PUZZLE_INPUT_FETCHER.getPuzzleInput(5))
             );
     public static void main(String[] args) {
         PUZZLES.forEach(puzzle -> {
