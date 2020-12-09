@@ -4,7 +4,7 @@ This repo is best thought of as my workbook.
 It attempts to solve the Advent of Code 2020 problems as you might in an enterprise environment, or working on a team of multiple other people.
 
 To that end:  
-- Modularity and human-legibility is favored over one-liners
+- Modularity and human-legibility is favored over inscrutible one-liners
 - Abstraction is used whenever it seems like the right move
 - Libraries that already solve a problem well are brought in, regardless of their size
 - `gradle` is a must, since it permeates industry
