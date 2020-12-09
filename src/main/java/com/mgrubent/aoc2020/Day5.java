@@ -1,13 +1,14 @@
 package com.mgrubent.aoc2020;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day5 extends Puzzle {
     private final List<BoardingPass> _boardingPasses;
+
     /**
      * Constructor which accepts the puzzle input to be solved
      *
@@ -30,6 +31,25 @@ public class Day5 extends Puzzle {
 
     @Override
     String solve2() {
+        Map<Integer, BoardingPass> bySeatId = new HashMap<>();
+        for (BoardingPass boardingPass : _boardingPasses) {
+            bySeatId.put(boardingPass.seatId(), boardingPass);
+        }
+
+        // Check for missing boarding passes
+        // Start on the second row, left-most column (inclusive)
+        // Stop on the last row, left-most column (exclusive)
+        List<Integer> mine = new LinkedList<>();
+        IntStream.range(8, 127 * 8)
+                .filter(seatId -> !bySeatId.containsKey(seatId))
+                .filter(possibleSeatId -> bySeatId.containsKey(possibleSeatId - 1))
+                .filter(possibleSeatId -> bySeatId.containsKey(possibleSeatId + 1))
+                .forEach(mine::add);
+
+
+        if (mine.size() == 1) {
+            return Integer.toString(mine.get(0));
+        }
         return null;
     }
 }
