@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 public class Day6 extends Puzzle {
     private List<List<Set<Character>>> _groupsPeopleAnswers = new LinkedList<>();
+
     /**
      * Constructor which accepts the puzzle input to be solved
      *
@@ -29,7 +30,10 @@ public class Day6 extends Puzzle {
         _groupsPeopleAnswers.add(tmpGroup);
     }
 
-
+    private Set<Character> azSet() {
+        // reuse https://stackoverflow.com/a/31641308/11280049 to return a new set with all the characters
+        return "abcdefghijklmnopqrstuvwxyz".chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
+    }
 
     @Override
     int getDay() {
@@ -51,7 +55,14 @@ public class Day6 extends Puzzle {
 
     @Override
     String solve2() {
-        return null;
+        int sum = 0;
+        for (List<Set<Character>> group : _groupsPeopleAnswers) {
+            // Save _only_ those letters that are present for every member of the group
+            Set<Character> allChars = azSet();
+            group.forEach(allChars::retainAll);
+            sum += allChars.size();
+        }
+        return Integer.toString(sum);
     }
 
 }
