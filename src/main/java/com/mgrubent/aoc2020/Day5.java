@@ -60,7 +60,6 @@ record BoardingPass(int row, int column, int seatId) {
     private static int _parseBitString(String bitString, char high) {
         int result = 0;
 
-
         for (int i = bitString.length() - 1, val = 1; i > -1; i--, val *= 2) {
             if (bitString.charAt(i) == high) result += val;
         }
