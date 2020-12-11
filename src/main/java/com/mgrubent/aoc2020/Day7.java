@@ -5,12 +5,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Day7 extends Puzzle {
+    // Define some Patterns to help in parsing the String input
     private static final Pattern lineRe =
             Pattern.compile("(?<outerBag>[a-z]+ [a-z]+) bags contain (?<innerBagSection>[a-z0-9, ]+).");
     private static final Pattern innerBagRe =
             Pattern.compile("(?<quantity>[0-9]+) (?<bagName>[a-z]+ [a-z]+) bags?");
 
+    // Our fully-parsed input
     private final Map<Bag, List<BagQuantity>> _bagMap = new HashMap<>();
+
+    // Define some data structures to cache intermediate results,
+    // preventing the performance hit of having to recalculate the same thing numerous times.
     private final Map<Bag, Long> _bagsInside = new HashMap<>();
     private final Map<BagPair, Boolean> _canContainCache = new HashMap<>();
 
@@ -26,6 +31,12 @@ public class Day7 extends Puzzle {
                 .forEach(bagRule -> _bagMap.put(bagRule.outermost(), bagRule.innerBags()));
     }
 
+    /**
+     * Given a bag, return how many bags it <em>must</em> contain.
+     *
+     * @param outer a {@link Bag} that may or may not contain any other bags
+     * @return how many bags the given bag _must_ contain.
+     */
     private long countBagsInside(Bag outer) {
         // Handle having already answered this question
         if (_bagsInside.containsKey(outer)) {
@@ -49,6 +60,14 @@ public class Day7 extends Puzzle {
         return bagCount;
     }
 
+    /**
+     * Can outer possibly contain inner, either directly or indirectly?
+     *
+     * @param outer the {@link Bag} that must be able to contain inner
+     * @param inner the {@link Bag} that must be inside outer, either directly or indirectly
+     * @return True if outer can possible contain inner, either directly or indirectly.
+     *         False otherwise.
+     */
     private boolean bagCanContain(Bag outer, Bag inner) {
         // Handle having already answered this question
         BagPair pair = new BagPair(outer, inner);
@@ -95,6 +114,12 @@ public class Day7 extends Puzzle {
         return false;
     }
 
+    /**
+     * Helper method to return a {@link BagRule} from a given line.
+     *
+     * @param line some line of puzzle input
+     * @return the BagRule that this line represents
+     */
     private static BagRule parseLine(String line) {
         Matcher m = lineRe.matcher(line);
         if (m.find()) {
@@ -110,6 +135,12 @@ public class Day7 extends Puzzle {
         }
     }
 
+    /**
+     * Helper method to return a List of {@link BagQuantity} from the given String
+     *
+     * @param innerBagSection the innerBagSection of {@link Day7#lineRe}
+     * @return a (possibly-empty) List of {@link BagQuantity} that the given String represents
+     */
     private static List<BagQuantity> parseInnerBags(String innerBagSection) {
         // Handle "no other bags" case
         if (innerBagSection.equals("no other bags")) {
@@ -132,6 +163,13 @@ public class Day7 extends Puzzle {
         return bagQuantities;
     }
 
+    /**
+     * Helper method to count the number of outer bags in {@link Day7#_bagMap} that could possibly contain
+     * the given innerBag.
+     *
+     * @param innerBag any {@link Bag}
+     * @return the number of outer bags in {@link Day7#_bagMap} that could possibly contain innerBag
+     */
     private long numberOfBagsContaining(Bag innerBag) {
         return _bagMap.keySet().stream().filter(outerBag -> this.bagCanContain(outerBag, innerBag)).count();
     }
