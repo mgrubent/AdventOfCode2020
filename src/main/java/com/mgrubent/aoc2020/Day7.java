@@ -11,6 +11,7 @@ public class Day7 extends Puzzle {
             Pattern.compile("(?<quantity>[0-9]+) (?<bagName>[a-z]+ [a-z]+) bags?");
 
     private final Map<Bag, List<BagQuantity>> _bagMap = new HashMap<>();
+    private final Map<Bag, Long> _bagsInside = new HashMap<>();
     private final Map<BagPair, Boolean> _canContainCache = new HashMap<>();
 
     /**
@@ -23,6 +24,25 @@ public class Day7 extends Puzzle {
         input.lines()
                 .map(Day7::parseLine)
                 .forEach(bagRule -> _bagMap.put(bagRule.outermost(), bagRule.innerBags()));
+    }
+
+    private long countBagsInside(Bag outer) {
+        // Handle having already answered this question
+        if (_bagsInside.containsKey(outer)) {
+            return _bagsInside.get(outer);
+        }
+
+        // Perform recursive BFS and update _bagsInside
+        List<BagQuantity> insideBags = _bagMap.get(outer);
+
+        long bagCount = 0L;
+
+        for (BagQuantity bagQuantity : insideBags) {
+            // countBagsInside could return 0, but we still want to count this bag as 1.
+            bagCount += (1 + countBagsInside(bagQuantity.bag())) * bagQuantity.quantity();
+        }
+
+        return bagCount;
     }
 
     private boolean bagCanContain(Bag outer, Bag inner) {
@@ -126,7 +146,9 @@ public class Day7 extends Puzzle {
 
     @Override
     String solve2() {
-        return null;
+        // Arbitrarily, the problem authors have chosen "shiny gold" bag as the target _outer_ bag
+        Bag shinyGold = new Bag("shiny gold");
+        return Long.toString(countBagsInside(shinyGold));
     }
 }
 

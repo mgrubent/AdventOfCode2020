@@ -28,11 +28,25 @@ public class Day7Test extends BasePuzzleTest {
 
     @Override
     public void testExample2() {
-        Assert.fail();
+        var day7 = new Day7(EXAMPLE);
+        Assert.assertEquals("32", day7.solve2());
+
+        final String example2 = """
+                shiny gold bags contain 2 dark red bags.
+                dark red bags contain 2 dark orange bags.
+                dark orange bags contain 2 dark yellow bags.
+                dark yellow bags contain 2 dark green bags.
+                dark green bags contain 2 dark blue bags.
+                dark blue bags contain 2 dark violet bags.
+                dark violet bags contain no other bags.""";
+
+        day7 = new Day7(example2);
+        Assert.assertEquals("126", day7.solve2());
     }
 
     @Override
     public void testPart2() throws Exception {
-        Assert.fail();
+        var day7 = new Day7(getStoredInput(7));
+        Assert.assertEquals("5956", day7.solve2());
     }
 }
