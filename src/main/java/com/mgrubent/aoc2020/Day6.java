@@ -22,8 +22,7 @@ public class Day6 extends Puzzle {
                 _groupsPeopleAnswers.add(new LinkedList<>(tmpGroup));
                 tmpGroup.clear();
             } else {
-                // https://stackoverflow.com/a/31641308/11280049
-                Set<Character> answers = line.chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
+                Set<Character> answers = stringToCharSet(line);
                 tmpGroup.add(answers);
             }
         }
@@ -31,8 +30,12 @@ public class Day6 extends Puzzle {
     }
 
     private Set<Character> azSet() {
-        // reuse https://stackoverflow.com/a/31641308/11280049 to return a new set with all the characters
-        return "abcdefghijklmnopqrstuvwxyz".chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
+        return stringToCharSet("abcdefghijklmnopqrstuvwxyz");
+    }
+
+    private static Set<Character> stringToCharSet(String s) {
+        // https://stackoverflow.com/a/31641308/11280049
+        return s.chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
     }
 
     @Override
