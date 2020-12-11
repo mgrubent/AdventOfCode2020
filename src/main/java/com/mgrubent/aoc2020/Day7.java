@@ -38,9 +38,13 @@ public class Day7 extends Puzzle {
         long bagCount = 0L;
 
         for (BagQuantity bagQuantity : insideBags) {
+            Bag current = bagQuantity.bag();
             // countBagsInside could return 0, but we still want to count this bag as 1 * its quantity.
-            bagCount += (1 + countBagsInside(bagQuantity.bag())) * bagQuantity.quantity();
+            bagCount += (1 + countBagsInside(current)) * bagQuantity.quantity();
         }
+
+        // Record that we've already made this calculation
+        _bagsInside.put(outer, bagCount);
 
         return bagCount;
     }
