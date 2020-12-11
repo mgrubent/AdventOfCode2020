@@ -22,7 +22,8 @@ public class Day7Test extends BasePuzzleTest {
 
     @Override
     public void testPart1() throws Exception {
-        Assert.fail();
+        var day7 = new Day7(getStoredInput(7));
+        Assert.assertEquals("144", day7.solve1());
     }
 
     @Override
