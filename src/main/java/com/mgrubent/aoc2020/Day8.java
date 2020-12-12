@@ -3,7 +3,10 @@ package com.mgrubent.aoc2020;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -12,7 +15,8 @@ public class Day8 extends Puzzle {
     private static final Pattern instructionRe =
             Pattern.compile("(?<operation>acc|jmp|nop) (?<argument>[+-][0-9]+)");
 
-    private final Process _process;
+    private Process _process;
+    private final Program _program;
 
     /**
      * Constructor which accepts the puzzle input to be solved
@@ -21,8 +25,12 @@ public class Day8 extends Puzzle {
      */
     Day8(String input) {
         super(input);
+
+        // Store the program, so that we can mutate it and instantiate fresh processes from it.
+        _program = new Program(input.lines().map(Day8::parseLine).collect(Collectors.toList()));
+
         // Parse every line into an instruction, wrap that as a Program, and wrap that inside a new Process
-        _process = new Process(new Program(input.lines().map(Day8::parseLine).collect(Collectors.toList())));
+        _process = new Process(_program);
     }
 
     private static Instruction parseLine(String line) {
@@ -56,8 +64,57 @@ public class Day8 extends Puzzle {
         }
     }
 
+    private Optional<Integer> getAccumulatorOnNormalExit() {
+        int lastAccumulator = _process.getAccumulator();
+        while (!_process.is_terminated()) {
+            lastAccumulator = _process.getAccumulator();
+            _process.step();
+        }
+
+        // If we are here, _process has terminated; we need to verify that it's because of normal exit
+        if (_process.get_exitCode().equals(ExitCode.NORMAL)) {
+            return Optional.of(lastAccumulator);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     @Override
     String solve2() {
+        // See if this program exits normally without mutation
+        Optional<Integer> accumulator = getAccumulatorOnNormalExit();
+        if (accumulator.isPresent()) {
+            return Integer.toString(accumulator.get());
+        }
+
+        // Brute force mutate the program until it exits normally
+        for (int i = 0; i < _program.instructions().size(); i++) {
+            Instruction currentInstruction = _program.instructions().get(i);
+            Operation op = currentInstruction.op();
+            // "By changing exactly one jmp or nop, you can repair the boot code and make it terminate correctly"
+            if (op.equals(Operation.NOP) || op.equals(Operation.JMP)) {
+                // Copy the existing instructions into a new program
+                List<Instruction> mutatedInstructions = new ArrayList<>(_program.instructions());
+
+                // Mutate this instruction, and insert it back into the mutatedInstructions list
+                Instruction mutatedInstruction = switch (op) {
+                    case JMP -> new Instruction(Operation.NOP, currentInstruction.arg());
+                    case NOP -> new Instruction(Operation.JMP, currentInstruction.arg());
+                    default -> throw new IllegalStateException("Unexpected value: " + op);
+                };
+                mutatedInstructions.set(i, mutatedInstruction);
+
+                // Instantiate a new process around these mutated instructions
+                _process = new Process(new Program(mutatedInstructions));
+
+                // Run this process and see if we get an accumulator
+                accumulator = getAccumulatorOnNormalExit();
+                if (accumulator.isPresent()) {
+                    return Integer.toString(accumulator.get());
+                }
+            }
+        }
+
         return null;
     }
 }
@@ -130,8 +187,17 @@ class Process {
             return;
         }
 
+        // Handle exiting normally,
+        // "by attempting to execute an instruction immediately after the last instruction in the file"
+        if (ptr == _program.instructions().size()) {
+            LOGGER.info("Attempting to execute an instruction immediately after the final instruction");
+            _terminated = true;
+            _exitCode = ExitCode.NORMAL;
+            return;
+        }
+
         // Handle being out of the program bounds
-        if (ptr < 0 || ptr >= _program.instructions().size()) {
+        if (ptr < 0 || ptr > _program.instructions().size()) {
             LOGGER.error("Program pointer {} is out of program bounds [0, {}]", ptr, _program.instructions().size());
             _terminated = true;
             _exitCode = ExitCode.OUT_OF_BOUNDS;
@@ -148,7 +214,7 @@ class Process {
         // Mark that this instruction has now been visited.
         _visited[ptr] = true;
 
-        // Execute the instruction
+        // Execute the next instruction
         execute(_program.instructions().get(ptr));
     }
 
