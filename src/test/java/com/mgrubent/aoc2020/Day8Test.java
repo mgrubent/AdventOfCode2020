@@ -48,6 +48,7 @@ public class Day8Test extends BasePuzzleTest {
 
     @Override
     public void testPart2() throws Exception {
-        Assert.fail();
+        var day8 = new Day8(getStoredInput(8));
+        Assert.assertEquals("780", day8.solve2());
     }
 }
