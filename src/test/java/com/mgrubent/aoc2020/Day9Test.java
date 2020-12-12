@@ -1,6 +1,10 @@
 package com.mgrubent.aoc2020;
 
+import org.junit.Test;
 import org.testng.Assert;
+
+import java.util.List;
+import java.util.Optional;
 
 public class Day9Test extends BasePuzzleTest {
     private static final String EXAMPLE = """
@@ -37,13 +41,27 @@ public class Day9Test extends BasePuzzleTest {
         Assert.assertEquals(day9.solve1(), "29221323");
     }
 
+    @Test
+    public void testListExtraction() {
+        var day9 = new Day9(EXAMPLE, 5);
+        List<Long> expected = List.of(15L, 25L, 47L, 40L);
+        Optional<List<Long>> actual = day9.setSum(14);
+        if (actual.isPresent()) {
+            Assert.assertEquals(actual.get(), expected);
+        } else {
+            Assert.fail();
+        }
+    }
+
     @Override
     public void testExample2() {
-
+        var day9 = new Day9(EXAMPLE, 5);
+        Assert.assertEquals(day9.solve2(), "62");
     }
 
     @Override
     public void testPart2() throws Exception {
-
+        var day9 = new Day9(getStoredInput(9));
+        Assert.assertEquals(day9.solve2(), "4389369");
     }
 }
