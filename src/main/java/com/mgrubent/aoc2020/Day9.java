@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Day9 extends Puzzle {
-    private final List<Integer> _intList;
+    private final List<Long> _intList;
     private final int _preamble;
     /**
      * Constructor which accepts the puzzle input to be solved
@@ -19,7 +19,7 @@ public class Day9 extends Puzzle {
 
         // Parsing the puzzle input here is quite straightforward; every line is an int,
         // and those ints should form a list.
-        _intList = input.lines().map(Integer::parseInt).collect(Collectors.toList());
+        _intList = input.lines().map(Long::parseUnsignedLong).collect(Collectors.toList());
 
         // We're told in the puzzle input that the preamble is 25, except in the example
         _preamble = 25;
@@ -38,7 +38,7 @@ public class Day9 extends Puzzle {
 
         // Parsing the puzzle input here is quite straightforward; every line is an int,
         // and those ints should form a list.
-        _intList = input.lines().map(Integer::parseInt).collect(Collectors.toList());
+        _intList = input.lines().map(Long::parseUnsignedLong).collect(Collectors.toList());
         _preamble = preamble;
     }
 
@@ -48,19 +48,15 @@ public class Day9 extends Puzzle {
      * @param target the sum that is sought
      * @param left the left-most index, inclusive, in which to search for matching numbers
      * @param right the right-most index, exclusive, in which to search for matching numbers
-     * @return a Pair of integers that sum to target, if any exist.
+     * @return a Pair of longs that sum to target, if any exist.
      *         Optional.empty() otherwise.
      */
-    private Optional<Pair<Integer, Integer>> twoSum(int target, int left, int right) {
-
-        System.out.println(_intList.subList(left, right));
-
+    private Optional<Pair<Long, Long>> twoSum(long target, int left, int right) {
         // Grab a sublist of our input and sort it
-        List<Integer> sortedIntegerList = _intList.subList(left, right).stream().sorted().collect(Collectors.toList());
-        System.out.println(sortedIntegerList);
+        List<Long> sortedIntegerList = _intList.subList(left, right).stream().sorted().collect(Collectors.toList());
 
-        int current;
-        int other;
+        long current;
+        long other;
 
         // It would have been nice to reuse the code from Day1 for this search, but
         // enough was different in their applications that it didn't seem immediately
@@ -69,11 +65,11 @@ public class Day9 extends Puzzle {
         // Accordingly, I've just reproduced most of the Day1 code here, with some tweaks
         for (int i = 0; i < sortedIntegerList.size(); i++) {
             current = sortedIntegerList.get(i);
-            int remaining = target - current;
+            long remaining = target - current;
             int lo = i;
             int hi = sortedIntegerList.size();
 
-            for (int mid = (lo + hi) / 2; lo <= hi && mid <= hi; mid = (lo + hi) / 2) {
+            for (int mid = (lo + hi) / 2; lo <= hi && mid < sortedIntegerList.size(); mid = (lo + hi) / 2) {
                 other = sortedIntegerList.get(mid);
                 if (other == remaining) {
                     return Optional.of(new kotlin.Pair<>(current, other));
@@ -95,8 +91,8 @@ public class Day9 extends Puzzle {
 
     @Override
     String solve1() {
-        Optional<Pair<Integer, Integer>> twoSumAns;
-        int target;
+        Optional<Pair<Long, Long>> twoSumAns;
+        long target;
 
         // Yes, i and right are the same throughout this loop.
         // I'm OK wasting two operations because I think it makes it more readable.
@@ -104,7 +100,7 @@ public class Day9 extends Puzzle {
             target = _intList.get(i);
             twoSumAns = twoSum(target, left, right);
             if (twoSumAns.isEmpty()) {
-                return Integer.toString(target);
+                return Long.toString(target);
             }
         }
         // We didn't find anything :/
