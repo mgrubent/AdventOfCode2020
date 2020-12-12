@@ -1,5 +1,8 @@
 package com.mgrubent.aoc2020;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +13,7 @@ public class Day8 extends Puzzle {
             Pattern.compile("(?<operation>acc|jmp|nop) (?<argument>[+-][0-9]+)");
 
     private final Process _process;
+
     /**
      * Constructor which accepts the puzzle input to be solved
      *
@@ -39,15 +43,16 @@ public class Day8 extends Puzzle {
     @Override
     String solve1() {
         int lastAccumulator = _process.getAccumulator();
-        while (true) {
-            try {
-                lastAccumulator = _process.getAccumulator();
-                _process.step();
-            } catch (IllegalStateException ise) {
-                return Integer.toString(lastAccumulator);
-            } catch (IndexOutOfBoundsException oobe) {
-                return null;
-            }
+        while (!_process.is_terminated()) {
+            lastAccumulator = _process.getAccumulator();
+            _process.step();
+        }
+
+        // If we are here, _process has terminated; we need to verify that it's because of infinite loop
+        if (_process.get_exitCode().equals(ExitCode.INFINITE_LOOP)) {
+            return Integer.toString(lastAccumulator);
+        } else {
+            return null;
         }
     }
 
@@ -66,10 +71,7 @@ enum Operation {
     JMP("jmp"),
     NOP("nop");
 
-    private final String _name;
-
     Operation(String name) {
-        _name = name;
     }
 }
 
@@ -81,15 +83,33 @@ record Program(List<Instruction> instructions) {
 
 }
 
+enum ExitCode {
+    NORMAL,
+    INFINITE_LOOP,
+    OUT_OF_BOUNDS;
+}
+
 class Process {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Process.class);
+
     private final Program _program;
     private int ptr = 0;
     private int accumulator = 0;
     private final boolean[] _visited;
+    private boolean _terminated;
+    private ExitCode _exitCode;
 
     Process(Program program) {
         _program = program;
         _visited = new boolean[_program.instructions().size()];
+    }
+
+    boolean is_terminated() {
+        return _terminated;
+    }
+
+    ExitCode get_exitCode() {
+        return _exitCode;
     }
 
     int getAccumulator() {
@@ -105,16 +125,25 @@ class Process {
      * @throws IllegalStateException if the executing instruction has been visited before.
      */
     void step() throws IllegalStateException {
+        // Handle this process having already terminated
+        if (_terminated) {
+            return;
+        }
+
         // Handle being out of the program bounds
         if (ptr < 0 || ptr >= _program.instructions().size()) {
-            throw new IndexOutOfBoundsException("Program pointer " + ptr + " is out of program bounds [0, "
-            + _program.instructions().size() + ")");
+            LOGGER.error("Program pointer {} is out of program bounds [0, {}]", ptr, _program.instructions().size());
+            _terminated = true;
+            _exitCode = ExitCode.OUT_OF_BOUNDS;
+            return;
         }
 
         // Handle having visited this instruction before
         if (_visited[ptr]) {
-            throw new IllegalStateException("Instruction " + ptr + ": " + _program.instructions().get(ptr)
-                    + " has already been visited!");
+            LOGGER.error("Instruction {}: {} has already been visited!", ptr, _program.instructions().get(ptr));
+            _terminated = true;
+            _exitCode = ExitCode.INFINITE_LOOP;
+            return;
         }
         // Mark that this instruction has now been visited.
         _visited[ptr] = true;
