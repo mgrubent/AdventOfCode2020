@@ -33,7 +33,8 @@ public class Day9Test extends BasePuzzleTest {
 
     @Override
     public void testPart1() throws Exception {
-
+        var day9 = new Day9(getStoredInput(9));
+        Assert.assertEquals(day9.solve1(), "29221323");
     }
 
     @Override
