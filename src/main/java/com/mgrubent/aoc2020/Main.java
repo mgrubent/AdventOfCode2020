@@ -13,7 +13,8 @@ public class Main {
             new Day6(PUZZLE_INPUT_FETCHER.getPuzzleInput(6)),
             new Day7(PUZZLE_INPUT_FETCHER.getPuzzleInput(7)),
             new Day8(PUZZLE_INPUT_FETCHER.getPuzzleInput(8)),
-            new Day9(PUZZLE_INPUT_FETCHER.getPuzzleInput(9))
+            new Day9(PUZZLE_INPUT_FETCHER.getPuzzleInput(9)),
+            new Day10(PUZZLE_INPUT_FETCHER.getPuzzleInput(10))
             );
     public static void main(String[] args) {
         PUZZLES.forEach(puzzle -> {

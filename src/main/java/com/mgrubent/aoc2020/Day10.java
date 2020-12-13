@@ -64,7 +64,8 @@ public class Day10 extends Puzzle {
 
     @Override
     String solve1() {
-        return null;
+        // "What is the number of 1-jolt differences multiplied by the number of 3-jolt differences?"
+        return Integer.toString(_joltageDifferences[1] * _joltageDifferences[3]);
     }
 
     @Override
