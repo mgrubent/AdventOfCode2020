@@ -1,9 +1,6 @@
 package com.mgrubent.aoc2020;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Day10 extends Puzzle {
@@ -29,14 +26,16 @@ public class Day10 extends Puzzle {
         // Instantiate "my device" with the expected JoltageAdapter
         _device = new Device(_joltageAdapters);
 
-
         // Calculate difference distribution statistics when connecting the charging outlet near our seat (0 joltage)
         // to our device, using all of our JoltageAdapters in series
-        List<Integer> sortedJoltageRatings = _joltageAdapters.stream()
-                .map(JoltageAdapter::getRating).sorted().collect(Collectors.toList());
+        List<Integer> sortedJoltageRatings = new LinkedList<>();
 
         // "Treat the charging outlet near your seat as having an effective joltage rating of 0."
-        sortedJoltageRatings.add(0, 0);
+        sortedJoltageRatings.add(0);
+
+        // Add in all of the joltage ratings from our JoltageAdapters
+        sortedJoltageRatings.addAll(_joltageAdapters.stream()
+                .map(JoltageAdapter::getRating).sorted().collect(Collectors.toList()));
 
         // Finally, we must consider the joltage rating of our device, which by definition is 3 higher
         // than the highest joltage rating of any of our JoltageAdapters
