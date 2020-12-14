@@ -43,7 +43,7 @@ public class Day10 extends Puzzle {
         return 10;
     }
 
-    private void calculateSequentialJoltageDifferences() {
+    private List<Integer> getChargerToDeviceJoltages() {
         // Calculate difference distribution statistics when connecting the charging outlet near our seat (0 joltage)
         // to our device, using all of our JoltageAdapters in series
         List<Integer> sortedJoltageRatings = new LinkedList<>();
@@ -58,6 +58,12 @@ public class Day10 extends Puzzle {
         // Finally, we must consider the joltage rating of our device, which by definition is 3 higher
         // than the highest joltage rating of any of our JoltageAdapters
         sortedJoltageRatings.add(_device.getJoltageAdapter().getRating());
+
+        return sortedJoltageRatings;
+    }
+
+    private void calculateSequentialJoltageDifferences() {
+        List<Integer> sortedJoltageRatings = getChargerToDeviceJoltages();
 
         // Sum all the differences
         for (int i = 0, j = 1; j < sortedJoltageRatings.size(); i++, j++) {
