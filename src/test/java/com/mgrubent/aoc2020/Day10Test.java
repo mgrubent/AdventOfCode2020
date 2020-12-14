@@ -97,6 +97,9 @@ public class Day10Test extends BasePuzzleTest {
     public void testExample2() {
         var day10 = new Day10(EXAMPLE);
         Assert.assertEquals("8", day10.solve2());
+
+        day10 = new Day10(LARGER_EXAMPLE);
+        Assert.assertEquals("19208", day10.solve2());
     }
 
     @Override

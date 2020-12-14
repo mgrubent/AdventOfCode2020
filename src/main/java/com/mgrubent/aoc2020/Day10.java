@@ -1,9 +1,14 @@
 package com.mgrubent.aoc2020;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Day10 extends Puzzle {
+    private final static Logger LOGGER = LoggerFactory.getLogger(Day10.class);
+
     private final List<JoltageAdapter> _joltageAdapters;
     private final Device _device;
 
@@ -11,6 +16,8 @@ public class Day10 extends Puzzle {
     // That said, I really don't want to have to deal inline with the conversion from 1-indexed-counting
     // to 0-indexed counting.  Accordingly, just accept the wasted space in exchange for greater readability.
     private final int[] _joltageDifferences = new int[4];
+
+    private final List<List<Integer>> _pathsToDevice = new LinkedList<>();
 
     /**
      * Constructor which accepts the puzzle input to be solved
@@ -72,6 +79,42 @@ public class Day10 extends Puzzle {
         }
     }
 
+    private void find(int target, List<Integer> previous, int currentIndex, List<Integer> joltages) {
+        // Defensively copy the List to prevent mutating an unexpectedly-common object
+        previous = new LinkedList<>(previous);
+
+        // Handle our currently being at the target
+        if (joltages.get(currentIndex) == target) {
+            previous.add(target);
+            _pathsToDevice.add(previous);
+            LOGGER.info("Found a new path: {}", previous);
+            return;
+        }
+
+        // Handle being past where the target could possibly be
+        if (currentIndex == joltages.size()) {
+            LOGGER.info("Path {} cannot possibly reach the target", previous);
+            return;
+        }
+
+        // If we're not currently at the target, "visit" this node
+        int currentJoltage = joltages.get(currentIndex);
+        previous.add(currentJoltage);
+
+        // Descend as many times as we can
+        for (int nextCompatibleIndex = currentIndex + 1;
+             nextCompatibleIndex < joltages.size() && joltages.get(nextCompatibleIndex) - currentJoltage < 4;
+             nextCompatibleIndex++) {
+            find(target, previous, nextCompatibleIndex, joltages);
+        }
+    }
+
+    private void findPathsToAdapter() {
+        List<Integer> sortedJoltageRatings = getChargerToDeviceJoltages();
+
+        find(_device.getJoltageAdapter().getRating(), new LinkedList<>(), 0, sortedJoltageRatings);
+    }
+
     @Override
     String solve1() {
         // "What is the number of 1-jolt differences multiplied by the number of 3-jolt differences?"
@@ -80,7 +123,8 @@ public class Day10 extends Puzzle {
 
     @Override
     String solve2() {
-        return null;
+        findPathsToAdapter();
+        return Long.toString(_pathsToDevice.size());
     }
 }
 
