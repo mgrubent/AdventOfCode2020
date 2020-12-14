@@ -3,7 +3,6 @@ package com.mgrubent.aoc2020;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class Day10Test extends BasePuzzleTest {
