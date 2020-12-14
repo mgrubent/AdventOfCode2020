@@ -17,8 +17,6 @@ public class Day10 extends Puzzle {
     // to 0-indexed counting.  Accordingly, just accept the wasted space in exchange for greater readability.
     private final int[] _joltageDifferences = new int[4];
 
-    private final Map<Integer, Long> _pathsFromIndex = new HashMap<>();
-
     /**
      * Constructor which accepts the puzzle input to be solved
      *
@@ -79,19 +77,17 @@ public class Day10 extends Puzzle {
         }
     }
 
-    private long countPathsToTarget(int target, int currentIndex, List<Integer> joltages, Queue<Integer> previous) {
+    private long countPathsToTarget(int target, int currentIndex, List<Integer> joltages, Map<Integer, Long> pathToTargetCount) {
         // Handle our having already calculated the number of paths to the device from this index
-        if (_pathsFromIndex.containsKey(currentIndex)) {
-            System.out.println("Shortcutting because we already found that " + currentIndex +
-                    " has " + _pathsFromIndex.get(currentIndex) + " paths to " + target);
-            return _pathsFromIndex.get(currentIndex);
+        if (pathToTargetCount.containsKey(currentIndex)) {
+            return pathToTargetCount.get(currentIndex);
         }
 
         // Handle our currently being at the target
         if (joltages.get(currentIndex) == target) {
-            System.out.println("Found a new path: " + previous);
+
             // Memorize the number of paths we've found
-            _pathsFromIndex.put(currentIndex, 1L);
+            pathToTargetCount.put(currentIndex, 1L);
             return 1;
         }
 
@@ -100,26 +96,31 @@ public class Day10 extends Puzzle {
             LOGGER.info("Path cannot possibly reach the target");
 
             // Memorize the number of paths we've found
-            _pathsFromIndex.put(currentIndex, 0L);
+            pathToTargetCount.put(currentIndex, 0L);
             return 0;
         }
 
         // If we're not currently at the target, "visit" this node
         int currentJoltage = joltages.get(currentIndex);
-        previous = new LinkedList<>(previous);
-        previous.add(currentJoltage);
 
+        // So far, we don't know of any paths from this index to the target
         long numPathsToTarget = 0;
 
         // Descend as many times as we can
-        for (int nextCompatibleIndex = currentIndex + 1;
+        for (int nextCompatibleIndex = currentIndex + 1; // The next JoltageAdapter must be after this one
+             // Further, the next JoltageAdapter's rating must be less than 4 higher than this one
              nextCompatibleIndex < joltages.size() && joltages.get(nextCompatibleIndex) - currentJoltage < 4;
+             // Keep going as long as there are compatible JoltageAdapters
              nextCompatibleIndex++) {
-            numPathsToTarget += countPathsToTarget(target, nextCompatibleIndex, joltages, previous);
+
+            // The number of paths from this index to the target is the sum of the number of paths to the target
+            // from each of this joltage adapter's compatible adapters (1, 2, or 3 ratings higher)
+            numPathsToTarget += countPathsToTarget(target, nextCompatibleIndex, joltages, pathToTargetCount);
         }
 
-        // Memorize the number of paths we've found
-        _pathsFromIndex.put(currentIndex, numPathsToTarget);
+        // Memorize the number of paths we've found from this index, so that subsequent calls with this currentIndex
+        // are O(1) rather than combinatorial
+        pathToTargetCount.put(currentIndex, numPathsToTarget);
 
         return numPathsToTarget;
     }
@@ -127,7 +128,10 @@ public class Day10 extends Puzzle {
     private long countPathsToDevice() {
         List<Integer> sortedJoltageRatings = getChargerToDeviceJoltages();
 
-        return countPathsToTarget(_device.getJoltageAdapter().getRating(), 0, sortedJoltageRatings, new LinkedList<>());
+        // Keep track of how many paths from this index are there to the target
+        Map<Integer, Long> pathsFromIndex = new HashMap<>();
+
+        return countPathsToTarget(_device.getJoltageAdapter().getRating(), 0, sortedJoltageRatings, pathsFromIndex);
     }
 
     @Override
