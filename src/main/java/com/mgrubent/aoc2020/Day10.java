@@ -156,20 +156,10 @@ class JoltageAdapter {
     int getRating() {
         return _rating;
     }
-
-    boolean canAcceptInputJoltage(int inputJoltage) {
-        // "Any given adapter can take an input 1, 2, or 3 jolts lower than its rating
-        // and still produce its rated output joltage."
-        return inputJoltage < _rating && inputJoltage >= _rating - 3;
-    }
 }
 
 class Device {
     private final JoltageAdapter _joltageAdapter;
-
-    Device(JoltageAdapter joltageAdapter) {
-        _joltageAdapter = joltageAdapter;
-    }
 
     Device(List<JoltageAdapter> joltageAdapters) {
         Optional<JoltageAdapter> max = joltageAdapters.stream().max(Comparator.comparingInt(JoltageAdapter::getRating));
