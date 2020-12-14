@@ -17,7 +17,7 @@ public class Day10 extends Puzzle {
     // to 0-indexed counting.  Accordingly, just accept the wasted space in exchange for greater readability.
     private final int[] _joltageDifferences = new int[4];
 
-    private final List<List<Integer>> _pathsToDevice = new LinkedList<>();
+    private int _numberOfPathsToDevice = 0;
 
     /**
      * Constructor which accepts the puzzle input to be solved
@@ -79,40 +79,35 @@ public class Day10 extends Puzzle {
         }
     }
 
-    private void find(int target, List<Integer> previous, int currentIndex, List<Integer> joltages) {
-        // Defensively copy the List to prevent mutating an unexpectedly-common object
-        previous = new LinkedList<>(previous);
-
+    private void find(int target, int currentIndex, List<Integer> joltages) {
         // Handle our currently being at the target
         if (joltages.get(currentIndex) == target) {
-            previous.add(target);
-            _pathsToDevice.add(previous);
-            LOGGER.info("Found a new path: {}", previous);
+            _numberOfPathsToDevice++;
+            LOGGER.info("Found a new path");
             return;
         }
 
         // Handle being past where the target could possibly be
         if (currentIndex == joltages.size()) {
-            LOGGER.info("Path {} cannot possibly reach the target", previous);
+            LOGGER.info("Path cannot possibly reach the target");
             return;
         }
 
         // If we're not currently at the target, "visit" this node
         int currentJoltage = joltages.get(currentIndex);
-        previous.add(currentJoltage);
 
         // Descend as many times as we can
         for (int nextCompatibleIndex = currentIndex + 1;
              nextCompatibleIndex < joltages.size() && joltages.get(nextCompatibleIndex) - currentJoltage < 4;
              nextCompatibleIndex++) {
-            find(target, previous, nextCompatibleIndex, joltages);
+            find(target, nextCompatibleIndex, joltages);
         }
     }
 
     private void findPathsToAdapter() {
         List<Integer> sortedJoltageRatings = getChargerToDeviceJoltages();
 
-        find(_device.getJoltageAdapter().getRating(), new LinkedList<>(), 0, sortedJoltageRatings);
+        find(_device.getJoltageAdapter().getRating(), 0, sortedJoltageRatings);
     }
 
     @Override
@@ -124,7 +119,7 @@ public class Day10 extends Puzzle {
     @Override
     String solve2() {
         findPathsToAdapter();
-        return Long.toString(_pathsToDevice.size());
+        return Integer.toString(_numberOfPathsToDevice);
     }
 }
 
