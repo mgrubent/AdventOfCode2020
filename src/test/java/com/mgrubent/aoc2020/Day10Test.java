@@ -104,6 +104,7 @@ public class Day10Test extends BasePuzzleTest {
 
     @Override
     public void testPart2() throws Exception {
-        Assert.fail();
+        var day10 = new Day10(getStoredInput(10));
+        Assert.assertEquals("28346956187648", day10.solve2());
     }
 }

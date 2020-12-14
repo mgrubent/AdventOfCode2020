@@ -17,7 +17,7 @@ public class Day10 extends Puzzle {
     // to 0-indexed counting.  Accordingly, just accept the wasted space in exchange for greater readability.
     private final int[] _joltageDifferences = new int[4];
 
-    private int _numberOfPathsToDevice = 0;
+    private final Map<Integer, Long> _pathsFromIndex = new HashMap<>();
 
     /**
      * Constructor which accepts the puzzle input to be solved
@@ -79,35 +79,55 @@ public class Day10 extends Puzzle {
         }
     }
 
-    private void find(int target, int currentIndex, List<Integer> joltages) {
+    private long countPathsToTarget(int target, int currentIndex, List<Integer> joltages, Queue<Integer> previous) {
+        // Handle our having already calculated the number of paths to the device from this index
+        if (_pathsFromIndex.containsKey(currentIndex)) {
+            System.out.println("Shortcutting because we already found that " + currentIndex +
+                    " has " + _pathsFromIndex.get(currentIndex) + " paths to " + target);
+            return _pathsFromIndex.get(currentIndex);
+        }
+
         // Handle our currently being at the target
         if (joltages.get(currentIndex) == target) {
-            _numberOfPathsToDevice++;
-            LOGGER.info("Found a new path");
-            return;
+            System.out.println("Found a new path: " + previous);
+            // Memorize the number of paths we've found
+            _pathsFromIndex.put(currentIndex, 1L);
+            return 1;
         }
 
         // Handle being past where the target could possibly be
         if (currentIndex == joltages.size()) {
             LOGGER.info("Path cannot possibly reach the target");
-            return;
+
+            // Memorize the number of paths we've found
+            _pathsFromIndex.put(currentIndex, 0L);
+            return 0;
         }
 
         // If we're not currently at the target, "visit" this node
         int currentJoltage = joltages.get(currentIndex);
+        previous = new LinkedList<>(previous);
+        previous.add(currentJoltage);
+
+        long numPathsToTarget = 0;
 
         // Descend as many times as we can
         for (int nextCompatibleIndex = currentIndex + 1;
              nextCompatibleIndex < joltages.size() && joltages.get(nextCompatibleIndex) - currentJoltage < 4;
              nextCompatibleIndex++) {
-            find(target, nextCompatibleIndex, joltages);
+            numPathsToTarget += countPathsToTarget(target, nextCompatibleIndex, joltages, previous);
         }
+
+        // Memorize the number of paths we've found
+        _pathsFromIndex.put(currentIndex, numPathsToTarget);
+
+        return numPathsToTarget;
     }
 
-    private void findPathsToAdapter() {
+    private long countPathsToDevice() {
         List<Integer> sortedJoltageRatings = getChargerToDeviceJoltages();
 
-        find(_device.getJoltageAdapter().getRating(), 0, sortedJoltageRatings);
+        return countPathsToTarget(_device.getJoltageAdapter().getRating(), 0, sortedJoltageRatings, new LinkedList<>());
     }
 
     @Override
@@ -118,8 +138,7 @@ public class Day10 extends Puzzle {
 
     @Override
     String solve2() {
-        findPathsToAdapter();
-        return Integer.toString(_numberOfPathsToDevice);
+        return Long.toString(countPathsToDevice());
     }
 }
 
