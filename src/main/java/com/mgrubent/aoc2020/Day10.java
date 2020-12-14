@@ -26,6 +26,24 @@ public class Day10 extends Puzzle {
         // Instantiate "my device" with the expected JoltageAdapter
         _device = new Device(_joltageAdapters);
 
+        // Calculate the sequential joltage differences
+        calculateSequentialJoltageDifferences();
+    }
+
+    int[] getJoltageDifferences() {
+        return Arrays.copyOf(_joltageDifferences, 4);
+    }
+
+    Device getDevice() {
+        return _device;
+    }
+
+    @Override
+    int getDay() {
+        return 10;
+    }
+
+    private void calculateSequentialJoltageDifferences() {
         // Calculate difference distribution statistics when connecting the charging outlet near our seat (0 joltage)
         // to our device, using all of our JoltageAdapters in series
         List<Integer> sortedJoltageRatings = new LinkedList<>();
@@ -46,19 +64,6 @@ public class Day10 extends Puzzle {
             int joltageDifference = sortedJoltageRatings.get(j) - sortedJoltageRatings.get(i);
             _joltageDifferences[joltageDifference]++;
         }
-    }
-
-    int[] getJoltageDifferences() {
-        return Arrays.copyOf(_joltageDifferences, 4);
-    }
-
-    Device getDevice() {
-        return _device;
-    }
-
-    @Override
-    int getDay() {
-        return 10;
     }
 
     @Override
